@@ -14,7 +14,7 @@ export default function SignUpPage() {
     e.preventDefault();
 
     if(password === passwordConfirm) {
-      axios.post('http://localhost:5000/cadastro', {name, email, password})
+      axios.post(`${import.meta.env.VITE_API.URL}/cadastro`, {name, email, password})
         .then(resp =>  console.log(resp))
         .catch(error => alert(error.response.data));
     } else {
@@ -26,11 +26,11 @@ export default function SignUpPage() {
     <SingUpContainer>
       <form onSubmit={signUp}>
         <MyWalletLogo />
-        <input value={name} onChange={e => setName(e.target.value)} placeholder="Nome" type="text" required/>
-        <input value={email} onChange={e => setEmail(e.target.value)} placeholder="E-mail" type="email" required/>
-        <input value={password} onChange={e => setPassword(e.target.value)} placeholder="Senha" type="password" autoComplete="new-password" required/>
-        <input value={passwordConfirm} onChange={e => setPasswordConfirm(e.target.value)} placeholder="Confirme a senha" type="password" autoComplete="new-password" required/>
-        <button type="submit">Cadastrar</button>
+        <input data-test='name' value={name} onChange={e => setName(e.target.value)} placeholder="Nome" type="text" required/>
+        <input data-test='email'value={email} onChange={e => setEmail(e.target.value)} placeholder="E-mail" type="email" required/>
+        <input data-test='password'value={password} onChange={e => setPassword(e.target.value)} placeholder="Senha" type="password" autoComplete="new-password" required/>
+        <input data-test='conf-password'value={passwordConfirm} onChange={e => setPasswordConfirm(e.target.value)} placeholder="Confirme a senha" type="password" autoComplete="new-password" required/>
+        <button data-test='sign-up-submit' type="submit">Cadastrar</button>
       </form>
 
       <Link to='/'>

@@ -16,7 +16,7 @@ export default function SignInPage() {
   function signIn(e) {
     e.preventDefault();
 
-    axios.post('http://localhost:5000/', {email, password})
+    axios.post(`${import.meta.env.VITE_API_URL}/`, {email, password})
       .then(resp => {console.log(resp)
         let token = resp.data
         setToken(token);
@@ -32,9 +32,9 @@ export default function SignInPage() {
     <SingInContainer>
       <form onSubmit={signIn}> 
         <MyWalletLogo />
-        <input value={email} onChange={e => setEmail(e.target.value)} placeholder="E-mail" type="email" required/>
-        <input value={password} onChange={e => setPassword(e.target.value)} placeholder="Senha" type="password" autoComplete="new-password" required/>
-        <button type="submit">Entrar</button>
+        <input data-test='email' value={email} onChange={e => setEmail(e.target.value)} placeholder="E-mail" type="email" required/>
+        <input data-test='password' value={password} onChange={e => setPassword(e.target.value)} placeholder="Senha" type="password" autoComplete="new-password" required/>
+        <button data-test='sign-in-submit' type="submit">Entrar</button>
       </form>
 
       <Link to='/cadastro'>
