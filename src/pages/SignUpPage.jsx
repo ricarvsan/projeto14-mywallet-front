@@ -14,7 +14,7 @@ export default function SignUpPage() {
     e.preventDefault();
 
     if(password === passwordConfirm) {
-      axios.post(`${import.meta.env.VITE_API.URL}/cadastro`, {name, email, password})
+      axios.post(`${import.meta.env.VITE_API_URL}/cadastro`, {name, email, password})
         .then(resp =>  console.log(resp))
         .catch(error => alert(error.response.data));
     } else {
