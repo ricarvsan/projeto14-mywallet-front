@@ -18,7 +18,6 @@ export default function SignInPage() {
 
     axios.post(`${import.meta.env.VITE_API_URL}/`, {email, password})
       .then(resp => {
-        console.log(resp.data)
         let newUser = resp.data;
         setToken(resp.data.token);
         setUser(newUser)

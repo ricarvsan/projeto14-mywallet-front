@@ -32,6 +32,8 @@ export default function TransactionsPage() {
     axios.get(`${import.meta.env.VITE_API_URL}/logged`, config)
       .then(r => setStatus(true))
       .catch(() => navigate('/'));
+
+    
   }, []);
 
   if(status) {

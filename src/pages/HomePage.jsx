@@ -6,11 +6,13 @@ import { UserContext } from "../contexts/UserContext";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
+
 export default function HomePage() {
-  const [itensList, setItensList] = useState('');
+  const [itensList, setItensList] = useState(undefined);
   const navigate = useNavigate();
   const { user, setUser } = useContext(UserContext);
   const [status, setStatus] = useState(undefined);
+  const [soma, setSoma] = useState(0);
 
   const config = {
     headers: {
@@ -38,39 +40,40 @@ export default function HomePage() {
     axios.get(`${import.meta.env.VITE_API_URL}/logged`, config)
       .then(r => setStatus(true))
       .catch(() => navigate('/'));
+
+
+    axios.get(`${import.meta.env.VITE_API_URL}/transacoes`, config)
+      .then(resp => {
+        setItensList(resp.data);
+        console.log(resp.data)
+        let newSoma = 0;
+        resp.data.forEach(item => {
+          (item.type === 'entrada') ? newSoma+= Number(item.value) : newSoma-= Number(item.value)
+        })
+        setSoma(newSoma.toFixed(2))        
+      })
+      .catch(() => navigate('/'));
+
   }, []);
 
-  if (status) {
+  if (itensList) {
     return (
       <HomeContainer>
         <Header>
           <h1 data-test='user-name'>Olá, {user.name}</h1>
-          <BiExit onClick={logout} data-test='logout'/>
+          <BiExit onClick={logout} data-test='logout' />
         </Header>
 
         <TransactionsContainer>
           <ul>
-            <ListItemContainer>
-              <div>
-                <span>30/11</span>
-                <strong data-test='registry-name'>Almoço mãe</strong>
-              </div>
-              <Value data-test='registry-amount' color={"negativo"}>120,00</Value>
-            </ListItemContainer>
-
-            <ListItemContainer>
-              <div>
-                <span>15/11</span>
-                <strong>Salário</strong>
-              </div>
-              <Value color={"positivo"}>3000,00</Value>
-            </ListItemContainer>
-
+            {itensList.map(item => (
+              <Item key={item._id} date={item.date} value={item.value} description={item.description} type={item.type}/>
+            ))}
           </ul>
 
           <article>
             <strong>Saldo</strong>
-            <Value data-test='total-amount' color={"positivo"}>2880,00</Value>
+            <Value data-test='total-amount' color={soma >= 0 ? 'positivo' : 'negativo'}>{soma}</Value>
           </article>
         </TransactionsContainer>
 
@@ -97,6 +100,19 @@ export default function HomePage() {
   }
 }
 
+function Item({date, value, description, type}) {
+  
+  return (
+      <ListItemContainer>
+          <div>
+              <span>{date}</span>
+              <strong data-test='registry-name'>{description}</strong>
+          </div>
+          <Value data-test='registry-amount' color={(type === 'entrada') ? 'positivo' : 'negativo'}>{value.replace('.', ',')}</Value>
+      </ListItemContainer>
+  );
+}
+
 const HomeContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -121,9 +137,14 @@ const TransactionsContainer = styled.article`
   flex-direction: column;
   justify-content: space-between;
   overflow-y: scroll;
+
   article {
+    position: sticky;
     display: flex;
-    justify-content: space-between;   
+    justify-content: space-between;
+    bottom: 0%;
+    height: 20%;
+    background-color: white;
     strong {
       font-weight: 700;
       text-transform: uppercase;
