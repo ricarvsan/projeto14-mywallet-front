@@ -17,11 +17,11 @@ export default function SignInPage() {
     e.preventDefault();
 
     axios.post(`${import.meta.env.VITE_API_URL}/`, {email, password})
-      .then(resp => {console.log(resp)
-        let token = resp.data
-        setToken(token);
-        setUser({token})
-        localStorage.setItem('token', resp.data);
+      .then(resp => {
+        console.log(resp.data)
+        let newUser = resp.data;
+        setToken(resp.data.token);
+        setUser(newUser)
         
         navigate('/home')
       })

@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import styled from "styled-components"
 import MyWalletLogo from "../components/MyWalletLogo"
 import { useState } from "react"
@@ -9,13 +9,15 @@ export default function SignUpPage() {
   const [email,setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
+  const navigate = useNavigate();
+
 
   function signUp(e) {
     e.preventDefault();
 
     if(password === passwordConfirm) {
       axios.post(`${import.meta.env.VITE_API_URL}/cadastro`, {name, email, password})
-        .then(resp =>  console.log(resp))
+        .then(() => navigate('/'))
         .catch(error => alert(error.response.data));
     } else {
       alert('As senhas precisam ser iguais!')

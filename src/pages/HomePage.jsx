@@ -1,54 +1,100 @@
 import styled from "styled-components"
 import { BiExit } from "react-icons/bi"
 import { AiOutlineMinusCircle, AiOutlinePlusCircle } from "react-icons/ai"
+import { useContext, useEffect, useState } from "react"
+import { UserContext } from "../contexts/UserContext";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 export default function HomePage() {
-  return (
-    <HomeContainer>
-      <Header>
-        <h1>Olá, Fulano</h1>
-        <BiExit />
-      </Header>
+  const [itensList, setItensList] = useState('');
+  const navigate = useNavigate();
+  const { user, setUser } = useContext(UserContext);
+  const [status, setStatus] = useState(undefined);
 
-      <TransactionsContainer>
-        <ul>
-          <ListItemContainer>
-            <div>
-              <span>30/11</span>
-              <strong>Almoço mãe</strong>
-            </div>
-            <Value color={"negativo"}>120,00</Value>
-          </ListItemContainer>
+  const config = {
+    headers: {
+      Authorization: `Bearer ${user.token}`
+    }
+  }
 
-          <ListItemContainer>
-            <div>
-              <span>15/11</span>
-              <strong>Salário</strong>
-            </div>
-            <Value color={"positivo"}>3000,00</Value>
-          </ListItemContainer>
-        </ul>
+  function logout() {
+    axios.post(`${import.meta.env.VITE_API_URL}/logout`, {}, config)
+      .then(() => {
+        navigate('/')
+      })
+      .catch(err => console.log(err.response.data))
+  }
 
-        <article>
-          <strong>Saldo</strong>
-          <Value color={"positivo"}>2880,00</Value>
-        </article>
-      </TransactionsContainer>
+  function add() {
+    navigate('/nova-transacao/entrada');
+  }
+
+  function sub() {
+    navigate('/nova-transacao/saida');
+  }
+
+  useEffect(() => {
+    axios.get(`${import.meta.env.VITE_API_URL}/logged`, config)
+      .then(r => setStatus(true))
+      .catch(() => navigate('/'));
+  }, []);
+
+  if (status) {
+    return (
+      <HomeContainer>
+        <Header>
+          <h1 data-test='user-name'>Olá, {user.name}</h1>
+          <BiExit onClick={logout} data-test='logout'/>
+        </Header>
+
+        <TransactionsContainer>
+          <ul>
+            <ListItemContainer>
+              <div>
+                <span>30/11</span>
+                <strong data-test='registry-name'>Almoço mãe</strong>
+              </div>
+              <Value data-test='registry-amount' color={"negativo"}>120,00</Value>
+            </ListItemContainer>
+
+            <ListItemContainer>
+              <div>
+                <span>15/11</span>
+                <strong>Salário</strong>
+              </div>
+              <Value color={"positivo"}>3000,00</Value>
+            </ListItemContainer>
+
+          </ul>
+
+          <article>
+            <strong>Saldo</strong>
+            <Value data-test='total-amount' color={"positivo"}>2880,00</Value>
+          </article>
+        </TransactionsContainer>
 
 
-      <ButtonsContainer>
-        <button>
-          <AiOutlinePlusCircle />
-          <p>Nova <br /> entrada</p>
-        </button>
-        <button>
-          <AiOutlineMinusCircle />
-          <p>Nova <br />saída</p>
-        </button>
-      </ButtonsContainer>
+        <ButtonsContainer>
+          <button data-test='new-income' onClick={add}>
+            <AiOutlinePlusCircle />
+            <p>Nova <br /> entrada</p>
+          </button>
+          <button data-test='new-expense' onClick={sub}>
+            <AiOutlineMinusCircle />
+            <p>Nova <br />saída</p>
+          </button>
+        </ButtonsContainer>
 
-    </HomeContainer>
-  )
+      </HomeContainer>
+    )
+  } else {
+    return (
+      <>
+        Não autorizado!
+      </>
+    )
+  }
 }
 
 const HomeContainer = styled.div`
@@ -74,6 +120,7 @@ const TransactionsContainer = styled.article`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  overflow-y: scroll;
   article {
     display: flex;
     justify-content: space-between;   
